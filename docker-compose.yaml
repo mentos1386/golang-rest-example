@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: dev
+      args:
+        - GO_VERSION=${GO_VERSION}
+    ports:
+      - 1234:1234
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:example@db:5432/postgres

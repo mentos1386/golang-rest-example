@@ -289,12 +289,17 @@ components:
   schemas:
     Ok:
       type: object
+      required:
+        - message
       properties:
         message:
           type: string
           example: OK
     Error:
       type: object
+      required:
+        - message
+        - code
       properties:
         message:
           type: string
@@ -308,6 +313,11 @@ components:
       example: 1
     User:
       type: object
+      required:
+        - id
+        - name
+        - email
+        - group
       properties:
         id:
           $ref: '#/components/schemas/Id'
@@ -321,6 +331,9 @@ components:
           $ref: '#/components/schemas/Group'
     UserUpdate:
       type: object
+      required:
+        - name
+        - email
       properties:
         name:
           type: string
@@ -330,6 +343,10 @@ components:
           example: john@example.com
     Group:
       type: object
+      required:
+        - id
+        - name
+        - users
       properties:
         id:
           $ref: '#/components/schemas/Id'
@@ -342,6 +359,8 @@ components:
             $ref: '#/components/schemas/User'
     GroupUpdate:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string
