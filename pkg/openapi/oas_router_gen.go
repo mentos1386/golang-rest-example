@@ -172,15 +172,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					// Param: "id"
-					// Match until "/"
-					idx := strings.IndexByte(elem, '/')
-					if idx < 0 {
-						idx = len(elem)
-					}
-					args[0] = elem[:idx]
-					elem = elem[idx:]
+					// Leaf parameter
+					args[0] = elem
+					elem = ""
 
 					if len(elem) == 0 {
+						// Leaf node.
 						switch r.Method {
 						case "DELETE":
 							s.handleUsersIDDeleteRequest([1]string{
@@ -199,31 +196,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						}
 
 						return
-					}
-					switch elem[0] {
-					case '/': // Prefix: "/group"
-						origElem := elem
-						if l := len("/group"); len(elem) >= l && elem[0:l] == "/group" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							// Leaf node.
-							switch r.Method {
-							case "PUT":
-								s.handleUsersIDGroupPutRequest([1]string{
-									args[0],
-								}, elemIsEscaped, w, r)
-							default:
-								s.notAllowed(w, r, "PUT")
-							}
-
-							return
-						}
-
-						elem = origElem
 					}
 
 					elem = origElem
@@ -472,17 +444,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					// Param: "id"
-					// Match until "/"
-					idx := strings.IndexByte(elem, '/')
-					if idx < 0 {
-						idx = len(elem)
-					}
-					args[0] = elem[:idx]
-					elem = elem[idx:]
+					// Leaf parameter
+					args[0] = elem
+					elem = ""
 
 					if len(elem) == 0 {
 						switch method {
 						case "DELETE":
+							// Leaf: UsersIDDelete
 							r.name = "UsersIDDelete"
 							r.summary = ""
 							r.operationID = ""
@@ -491,6 +460,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.count = 1
 							return r, true
 						case "GET":
+							// Leaf: UsersIDGet
 							r.name = "UsersIDGet"
 							r.summary = ""
 							r.operationID = ""
@@ -499,6 +469,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.count = 1
 							return r, true
 						case "PUT":
+							// Leaf: UsersIDPut
 							r.name = "UsersIDPut"
 							r.summary = ""
 							r.operationID = ""
@@ -509,33 +480,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						default:
 							return
 						}
-					}
-					switch elem[0] {
-					case '/': // Prefix: "/group"
-						origElem := elem
-						if l := len("/group"); len(elem) >= l && elem[0:l] == "/group" {
-							elem = elem[l:]
-						} else {
-							break
-						}
-
-						if len(elem) == 0 {
-							switch method {
-							case "PUT":
-								// Leaf: UsersIDGroupPut
-								r.name = "UsersIDGroupPut"
-								r.summary = ""
-								r.operationID = ""
-								r.pathPattern = "/users/{id}/group"
-								r.args = args
-								r.count = 1
-								return r, true
-							default:
-								return
-							}
-						}
-
-						elem = origElem
 					}
 
 					elem = origElem

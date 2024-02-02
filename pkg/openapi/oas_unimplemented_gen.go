@@ -92,15 +92,6 @@ func (UnimplementedHandler) UsersIDGet(ctx context.Context, params UsersIDGetPar
 	return r, ht.ErrNotImplemented
 }
 
-// UsersIDGroupPut implements PUT /users/{id}/group operation.
-//
-// Update user group by id.
-//
-// PUT /users/{id}/group
-func (UnimplementedHandler) UsersIDGroupPut(ctx context.Context, req *UsersIDGroupPutReq, params UsersIDGroupPutParams) (r UsersIDGroupPutRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
 // UsersIDPut implements PUT /users/{id} operation.
 //
 // Update user by id.

@@ -143,9 +143,9 @@ func (s *Group) encodeFields(e *jx.Encoder) {
 		e.Str(s.Name)
 	}
 	{
-		e.FieldStart("users")
+		e.FieldStart("user_ids")
 		e.ArrStart()
-		for _, elem := range s.Users {
+		for _, elem := range s.UserIds {
 			elem.Encode(e)
 		}
 		e.ArrEnd()
@@ -155,7 +155,7 @@ func (s *Group) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfGroup = [3]string{
 	0: "id",
 	1: "name",
-	2: "users",
+	2: "user_ids",
 }
 
 // Decode decodes Group from json.
@@ -189,23 +189,23 @@ func (s *Group) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"name\"")
 			}
-		case "users":
+		case "user_ids":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Users = make([]User, 0)
+				s.UserIds = make([]ID, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem User
+					var elem ID
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
-					s.Users = append(s.Users, elem)
+					s.UserIds = append(s.UserIds, elem)
 					return nil
 				}); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"users\"")
+				return errors.Wrap(err, "decode field \"user_ids\"")
 			}
 		default:
 			return d.Skip()
@@ -495,39 +495,6 @@ func (s *Ok) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes ID as json.
-func (o OptID) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes ID from json.
-func (o *OptID) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptID to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptID) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptID) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode implements json.Marshaler.
 func (s *User) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -550,8 +517,8 @@ func (s *User) encodeFields(e *jx.Encoder) {
 		e.Str(s.Email)
 	}
 	{
-		e.FieldStart("group")
-		s.Group.Encode(e)
+		e.FieldStart("group_id")
+		s.GroupID.Encode(e)
 	}
 }
 
@@ -559,7 +526,7 @@ var jsonFieldsNameOfUser = [4]string{
 	0: "id",
 	1: "name",
 	2: "email",
-	3: "group",
+	3: "group_id",
 }
 
 // Decode decodes User from json.
@@ -605,15 +572,15 @@ func (s *User) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"email\"")
 			}
-		case "group":
+		case "group_id":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				if err := s.Group.Decode(d); err != nil {
+				if err := s.GroupID.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"group\"")
+				return errors.Wrap(err, "decode field \"group_id\"")
 			}
 		default:
 			return d.Skip()
@@ -688,11 +655,16 @@ func (s *UserUpdate) encodeFields(e *jx.Encoder) {
 		e.FieldStart("email")
 		e.Str(s.Email)
 	}
+	{
+		e.FieldStart("group_id")
+		s.GroupID.Encode(e)
+	}
 }
 
-var jsonFieldsNameOfUserUpdate = [2]string{
+var jsonFieldsNameOfUserUpdate = [3]string{
 	0: "name",
 	1: "email",
+	2: "group_id",
 }
 
 // Decode decodes UserUpdate from json.
@@ -728,6 +700,16 @@ func (s *UserUpdate) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"email\"")
 			}
+		case "group_id":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				if err := s.GroupID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group_id\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -738,7 +720,7 @@ func (s *UserUpdate) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00000011,
+		0b00000111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -780,69 +762,6 @@ func (s *UserUpdate) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *UserUpdate) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *UsersIDGroupPutReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *UsersIDGroupPutReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.Group.Set {
-			e.FieldStart("group")
-			s.Group.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfUsersIDGroupPutReq = [1]string{
-	0: "group",
-}
-
-// Decode decodes UsersIDGroupPutReq from json.
-func (s *UsersIDGroupPutReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode UsersIDGroupPutReq to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "group":
-			if err := func() error {
-				s.Group.Reset()
-				if err := s.Group.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"group\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode UsersIDGroupPutReq")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *UsersIDGroupPutReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *UsersIDGroupPutReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

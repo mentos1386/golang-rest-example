@@ -21,10 +21,6 @@ type UsersIDGetRes interface {
 	usersIDGetRes()
 }
 
-type UsersIDGroupPutRes interface {
-	usersIDGroupPutRes()
-}
-
 type UsersIDPutRes interface {
 	usersIDPutRes()
 }

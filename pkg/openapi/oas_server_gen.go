@@ -60,12 +60,6 @@ type Handler interface {
 	//
 	// GET /users/{id}
 	UsersIDGet(ctx context.Context, params UsersIDGetParams) (UsersIDGetRes, error)
-	// UsersIDGroupPut implements PUT /users/{id}/group operation.
-	//
-	// Update user group by id.
-	//
-	// PUT /users/{id}/group
-	UsersIDGroupPut(ctx context.Context, req *UsersIDGroupPutReq, params UsersIDGroupPutParams) (UsersIDGroupPutRes, error)
 	// UsersIDPut implements PUT /users/{id} operation.
 	//
 	// Update user by id.

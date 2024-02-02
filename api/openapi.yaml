@@ -8,7 +8,7 @@ info:
   description: >
     Example OpenAPI Golang server.
 servers:
-  - url: http://localhost:1323/api/v1
+  - url: http://localhost:1234
     description: Local server
 tags:
   - name: health
@@ -127,38 +127,6 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/Ok'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        default:
-          $ref: '#/components/responses/UnexpectedError'
-  /users/{id}/group:
-    put:
-      description: Update user group by id
-      tags:
-        - users
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          $ref: '#/components/schemas/Id'
-      requestBody:
-        description: Group object
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                group:
-                  $ref: '#/components/schemas/Id'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
         '404':
           $ref: '#/components/responses/NotFound'
         default:
@@ -317,7 +285,7 @@ components:
         - id
         - name
         - email
-        - group
+        - group_id
       properties:
         id:
           $ref: '#/components/schemas/Id'
@@ -327,13 +295,14 @@ components:
         email:
           type: string
           example: john@example.com
-        group:
-          $ref: '#/components/schemas/Group'
+        group_id:
+          $ref: '#/components/schemas/Id'
     UserUpdate:
       type: object
       required:
         - name
         - email
+        - group_id
       properties:
         name:
           type: string
@@ -341,22 +310,24 @@ components:
         email:
           type: string
           example: john@example.com
+        group_id:
+          $ref: '#/components/schemas/Id'
     Group:
       type: object
       required:
         - id
         - name
-        - users
+        - user_ids
       properties:
         id:
           $ref: '#/components/schemas/Id'
         name:
           type: string
           example: admins
-        users:
+        user_ids:
           type: array
           items:
-            $ref: '#/components/schemas/User'
+            $ref: '#/components/schemas/Id'
     GroupUpdate:
       type: object
       required:

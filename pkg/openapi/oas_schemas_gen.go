@@ -36,13 +36,12 @@ func (s *Error) SetCode(val int) {
 	s.Code = val
 }
 
-func (*Error) groupsIDDeleteRes()  {}
-func (*Error) groupsIDGetRes()     {}
-func (*Error) groupsIDPutRes()     {}
-func (*Error) usersIDDeleteRes()   {}
-func (*Error) usersIDGetRes()      {}
-func (*Error) usersIDGroupPutRes() {}
-func (*Error) usersIDPutRes()      {}
+func (*Error) groupsIDDeleteRes() {}
+func (*Error) groupsIDGetRes()    {}
+func (*Error) groupsIDPutRes()    {}
+func (*Error) usersIDDeleteRes()  {}
+func (*Error) usersIDGetRes()     {}
+func (*Error) usersIDPutRes()     {}
 
 // ErrorStatusCode wraps Error with StatusCode.
 type ErrorStatusCode struct {
@@ -72,9 +71,9 @@ func (s *ErrorStatusCode) SetResponse(val Error) {
 
 // Ref: #/components/schemas/Group
 type Group struct {
-	ID    ID     `json:"id"`
-	Name  string `json:"name"`
-	Users []User `json:"users"`
+	ID      ID     `json:"id"`
+	Name    string `json:"name"`
+	UserIds []ID   `json:"user_ids"`
 }
 
 // GetID returns the value of ID.
@@ -87,9 +86,9 @@ func (s *Group) GetName() string {
 	return s.Name
 }
 
-// GetUsers returns the value of Users.
-func (s *Group) GetUsers() []User {
-	return s.Users
+// GetUserIds returns the value of UserIds.
+func (s *Group) GetUserIds() []ID {
+	return s.UserIds
 }
 
 // SetID sets the value of ID.
@@ -102,9 +101,9 @@ func (s *Group) SetName(val string) {
 	s.Name = val
 }
 
-// SetUsers sets the value of Users.
-func (s *Group) SetUsers(val []User) {
-	s.Users = val
+// SetUserIds sets the value of UserIds.
+func (s *Group) SetUserIds(val []ID) {
+	s.UserIds = val
 }
 
 func (*Group) groupsIDGetRes() {}
@@ -145,58 +144,12 @@ func (s *Ok) SetMessage(val string) {
 func (*Ok) groupsIDDeleteRes() {}
 func (*Ok) usersIDDeleteRes()  {}
 
-// NewOptID returns new OptID with value set to v.
-func NewOptID(v ID) OptID {
-	return OptID{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptID is optional ID.
-type OptID struct {
-	Value ID
-	Set   bool
-}
-
-// IsSet returns true if OptID was set.
-func (o OptID) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptID) Reset() {
-	var v ID
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptID) SetTo(v ID) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptID) Get() (v ID, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptID) Or(d ID) ID {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // Ref: #/components/schemas/User
 type User struct {
-	ID    ID     `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	Group Group  `json:"group"`
+	ID      ID     `json:"id"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	GroupID ID     `json:"group_id"`
 }
 
 // GetID returns the value of ID.
@@ -214,9 +167,9 @@ func (s *User) GetEmail() string {
 	return s.Email
 }
 
-// GetGroup returns the value of Group.
-func (s *User) GetGroup() Group {
-	return s.Group
+// GetGroupID returns the value of GroupID.
+func (s *User) GetGroupID() ID {
+	return s.GroupID
 }
 
 // SetID sets the value of ID.
@@ -234,19 +187,19 @@ func (s *User) SetEmail(val string) {
 	s.Email = val
 }
 
-// SetGroup sets the value of Group.
-func (s *User) SetGroup(val Group) {
-	s.Group = val
+// SetGroupID sets the value of GroupID.
+func (s *User) SetGroupID(val ID) {
+	s.GroupID = val
 }
 
-func (*User) usersIDGetRes()      {}
-func (*User) usersIDGroupPutRes() {}
-func (*User) usersIDPutRes()      {}
+func (*User) usersIDGetRes() {}
+func (*User) usersIDPutRes() {}
 
 // Ref: #/components/schemas/UserUpdate
 type UserUpdate struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Name    string `json:"name"`
+	Email   string `json:"email"`
+	GroupID ID     `json:"group_id"`
 }
 
 // GetName returns the value of Name.
@@ -259,6 +212,11 @@ func (s *UserUpdate) GetEmail() string {
 	return s.Email
 }
 
+// GetGroupID returns the value of GroupID.
+func (s *UserUpdate) GetGroupID() ID {
+	return s.GroupID
+}
+
 // SetName sets the value of Name.
 func (s *UserUpdate) SetName(val string) {
 	s.Name = val
@@ -269,16 +227,7 @@ func (s *UserUpdate) SetEmail(val string) {
 	s.Email = val
 }
 
-type UsersIDGroupPutReq struct {
-	Group OptID `json:"group"`
-}
-
-// GetGroup returns the value of Group.
-func (s *UsersIDGroupPutReq) GetGroup() OptID {
-	return s.Group
-}
-
-// SetGroup sets the value of Group.
-func (s *UsersIDGroupPutReq) SetGroup(val OptID) {
-	s.Group = val
+// SetGroupID sets the value of GroupID.
+func (s *UserUpdate) SetGroupID(val ID) {
+	s.GroupID = val
 }
