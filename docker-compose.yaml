@@ -8,36 +8,33 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -d $${postgres_db} -u $${postgres_user}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - 1233:5432
 
   app:
+    image: golang-rest-example
     build:
       dockerfile: Dockerfile
       context: .
-      target: dev
       args:
         - GO_VERSION=${GO_VERSION}
     ports:
       - 1234:1234
-    volumes:
-      - .:/app
     depends_on:
       db:
         condition: service_healthy
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres?sslmode=disable
-      - PORT=1234
 
   swagger:
     image: swaggerapi/swagger-ui
     ports:
       - 1235:8080
     environment:
-      - SWAGGER_JSON=/api/openapi.yaml
+      - SWAGGER_JSON=/openapi.yaml
     volumes:
-      - ./api:/api
-    depends_on:
-      - app
+      - ./api/openapi.yaml:/openapi.yaml:ro

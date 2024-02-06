@@ -17,7 +17,6 @@ import (
 type ApiService struct {
 	logger *zap.Logger
 	db     *sql.DB
-	groups []*openapi.Group
 
 	Config *config.Config
 
@@ -50,7 +49,7 @@ func NewApiService() *ApiService {
 		logger.Fatal("Failed to create the driver", zap.Error(err))
 	}
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:///app/migrations",
+		config.DatabaseMigrations,
 		"postgres", driver)
 	if err != nil {
 		logger.Fatal("Failed to create the migration", zap.Error(err))
