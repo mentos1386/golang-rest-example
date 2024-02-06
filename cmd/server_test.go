@@ -59,6 +59,12 @@ func setup(t *testing.T) (func(), *openapi.Server) {
 	}, server
 }
 
+func toJson(t *testing.T, request interface{ MarshalJSON() ([]byte, error) }) *bytes.Buffer {
+	json, err := request.MarshalJSON()
+	assert.Nil(t, err)
+	return bytes.NewBuffer(json)
+}
+
 func TestHealth(t *testing.T) {
 	teardown, srv := setup(t)
 	defer teardown()
@@ -78,11 +84,8 @@ func TestCreatingGroup(t *testing.T) {
 	teardown, srv := setup(t)
 	defer teardown()
 
-	groupUpdate := openapi.GroupUpdate{Name: "test"}
-	json, err := groupUpdate.MarshalJSON()
-	assert.Nil(t, err)
-
-	req, err := http.NewRequest("POST", "/groups", bytes.NewBuffer(json))
+	// TODO: Maybe we can create a "newRequest" method to wrap this 6 lines?
+	req, err := http.NewRequest("POST", "/groups", toJson(t, &openapi.GroupUpdate{Name: "test"}))
 	assert.Nil(t, err)
 	req.Header.Add("Content-Type", "application/json")
 
