@@ -19,17 +19,8 @@ import (
 )
 
 func setupPostgres(ctx context.Context, t *testing.T) *postgres.PostgresContainer {
-
-	dbName := "users"
-	dbUser := "user"
-	dbPassword := "password"
-
 	postgresContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("docker.io/postgres:15.2-alpine"),
-		postgres.WithDatabase(dbName),
-		postgres.WithUsername(dbUser),
-		postgres.WithPassword(dbPassword),
-
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).
